@@ -42,7 +42,7 @@ sleep 1
 # ===============================
 progress_echo "🗂️ Copiando dotfiles..."
 mkdir -p ~/.config/wezterm/
-cp "$SCRIPT_DIR/.wezterm.lua" ~/.config/wezterm/ 2>/dev/null || true
+cp "$SCRIPT_DIR/.wezterm.lua" ~/.config/wezterm/wezterm.lua
 cp "$SCRIPT_DIR/.zshrc" ~/
 cp "$SCRIPT_DIR/.tmux.conf" ~/
 echo "✅ Dotfiles copiados!"
@@ -58,6 +58,19 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
   echo "✅ oh-my-zsh instalado!"
 else
   echo "✅ oh-my-zsh já está instalado!"
+fi
+sleep 1
+
+# ===============================
+# 🚀 Instala Starship Prompt
+# ===============================
+if ! command -v starship &> /dev/null; then
+  progress_echo "🚀 Instalando Starship Prompt"
+  curl -sS https://starship.rs/install.sh | sh -s -- --yes
+  echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+  echo "✅ Starship instalado e configurado!"
+else
+  echo "✅ Starship já está instalado!"
 fi
 sleep 1
 
