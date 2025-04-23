@@ -38,18 +38,6 @@ echo
 sleep 1
 
 # ===============================
-# 🗂️ Copiando arquivos de configuração
-# ===============================
-progress_echo "🗂️ Copiando dotfiles..."
-mkdir -p ~/.config/wezterm/
-cp "$SCRIPT_DIR/.wezterm.lua" ~/.config/wezterm/wezterm.lua
-cp "$SCRIPT_DIR/.zshrc" ~/
-cp "$SCRIPT_DIR/.tmux.conf" ~/
-echo "✅ Dotfiles copiados!"
-echo
-sleep 1
-
-# ===============================
 # ⚙️ oh-my-zsh
 # ===============================
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
@@ -88,6 +76,18 @@ sleep 1
 # ===============================
 chsh -s "$(which zsh)"
 echo "✅ zsh definido como shell padrão!"
+sleep 1
+
+# ===============================
+# 🗂️ Copiando arquivos de configuração
+# ===============================
+progress_echo "🗂️ Copiando dotfiles..."
+mkdir -p ~/.config/wezterm/
+cp "$SCRIPT_DIR/.wezterm.lua" ~/.config/wezterm/wezterm.lua
+cp "$SCRIPT_DIR/.zshrc" ~/
+cp "$SCRIPT_DIR/.tmux.conf" ~/
+echo "✅ Dotfiles copiados!"
+echo
 sleep 1
 
 # ===============================
