@@ -101,7 +101,8 @@ echo
 # 🗂️ Copiando configs i3 e rofi
 # ============================
 progress_echo "📁 Copiando arquivos de configuração do i3 e rofi"
-cp -r "$SCRIPT_DIR/.config/"* "$HOME/.config/"
+cp -rv "$SCRIPT_DIR/i3" ~/.config/
+cp -rv "$SCRIPT_DIR/rofi" ~/.config/
 
 # Permissões de execução
 chmod +x "$HOME/.config/i3/scripts/"* 2>/dev/null || true
