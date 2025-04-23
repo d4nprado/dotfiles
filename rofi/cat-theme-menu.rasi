@@ -1,0 +1,69 @@
+configuration {
+  location: 4;
+}
+
+* {
+  font: "JetBrainsMono Nerd Font 10";
+  border: 0;
+  padding: 6;
+  spacing: 6;
+  background-color: #1e1e2e;
+  text-color: #cdd6f4;
+}
+
+window {
+  width: 220px;
+  border: 2;
+  border-radius: 10;
+  border-color: #313244;
+  background-color: #1e1e2e;
+}
+
+mainbox {
+  children: [inputbar, listview];
+}
+
+inputbar {
+  padding: 4;
+  background-color: #1e1e2e;
+  children: [prompt, entry];
+}
+
+prompt {
+  text-color: #89b4fa;
+}
+
+entry {
+  text-color: #cdd6f4;
+  placeholder: "";
+}
+
+listview {
+  columns: 1;
+  spacing: 2px;
+  fixed-height: false;
+  background-color: inherit;
+  scrollbar: false;
+  dynamic: true;
+}
+
+element {
+  background-color: transparent;
+  border-radius: 4;
+  text-color: #cdd6f4;
+  padding: 1 2;
+}
+
+element-text {
+  background-color: inherit;
+  text-color:       inherit;
+}
+
+element selected {
+  background-color: #f5c2e7;
+  text-color: #1e1e2e;
+  border: 2;
+  border-color: #f5c2e7;
+  border-radius: 4;
+  background-image: none;
+}

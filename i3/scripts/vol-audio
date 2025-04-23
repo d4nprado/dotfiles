@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# Volume de saída para i3blocks
+# Scroll ↑↓ para aumentar/diminuir
+# Clique direito para mutar/demutar
+
+STEP="5%"
+
+# Detecta PulseAudio/PipeWire
+MIXER="default"
+if command -v pulseaudio >/dev/null 2>&1 && pulseaudio --check ; then
+    if amixer -D pulse info >/dev/null 2>&1 ; then
+        MIXER="pulse"
+    fi
+fi
+
+SCONTROL="${BLOCK_INSTANCE:-Master}"
+
+get_volume() {
+    output=$(amixer -D "$MIXER" get "$SCONTROL")
+    volume=$(echo "$output" | grep -oP '\[\d+%\]' | head -1 | tr -d '[]')
+    mute=$(echo "$output" | grep -oP '\[(on|off)\]' | head -1 | tr -d '[]')
+
+    if [[ "$mute" = "off" ]]; then
+        echo "MUTE"
+        echo "MUTE"
+        echo "#FF0000"
+    else
+        echo "$volume"
+        echo "$volume"
+    fi
+}
+
+case "$BLOCK_BUTTON" in
+    3) amixer -q -D "$MIXER" sset "$SCONTROL" toggle ;;              # botão direito: mute
+    4) amixer -q -D "$MIXER" sset "$SCONTROL" ${STEP}+ unmute ;;    # scroll up
+    5) amixer -q -D "$MIXER" sset "$SCONTROL" ${STEP}- unmute ;;    # scroll down
+esac
+
+get_volume

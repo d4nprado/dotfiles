@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+MIXER="default"
+STEP="5%"
+
+# Detecta PulseAudio
+if command -v pulseaudio >/dev/null 2>&1 && pulseaudio --check ; then
+    if amixer -D pulse info >/dev/null 2>&1 ; then
+        MIXER="pulse"
+    fi
+fi
+
+SCONTROL="${BLOCK_INSTANCE:-Capture}"
+
+get_volume() {
+    output=$(amixer -D "$MIXER" get "$SCONTROL" Capture)
+
+    volume=$(echo "$output" | grep -oP '\[\d+%\]' | head -1 | tr -d '[]')
+    mute=$(echo "$output" | grep -oP '\[(on|off)\]' | tail -1 | tr -d '[]')
+
+    if [ "$mute" = "off" ]; then
+        echo "MUTE"
+        echo "MUTE"
+        echo "#FF0000"
+    else
+        echo "$volume"
+        echo "$volume"
+    fi
+}
+
+case "$BLOCK_BUTTON" in
+    3) amixer -q -D "$MIXER" sset "$SCONTROL" toggle ;;
+    4) amixer -q -D "$MIXER" sset "$SCONTROL" ${STEP}+ unmute ;;
+    5) amixer -q -D "$MIXER" sset "$SCONTROL" ${STEP}- unmute ;;
+esac
+
+get_volume

@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+# Tema do Rofi
+ROFI_THEME="$HOME/.config/rofi/cat-theme-menu.rasi"
+
+# Interface Wi-Fi (pega automaticamente)
+IFACE=$(nmcli device | grep wifi | awk '{print $1}' | head -n1)
+
+# Sai se não houver interface Wi-Fi
+if [[ -z "$IFACE" ]]; then
+  echo -e " Desconectado"
+  echo -e " Desconectado"
+  echo "#FF0000"
+  exit 0
+fi
+
+# Verifica status atual de conexão
+SSID=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2)
+WIRED=$(nmcli -t -f DEVICE,TYPE,STATE device | grep '^.*:ethernet:conectado\|connected$' | cut -d: -f1)
+
+# Clique abre seletor
+if [ "$BLOCK_BUTTON" = "1" ]; then
+  # Atualiza lista de redes
+  nmcli device wifi rescan &>/dev/null
+  
+  # Pega lista formatada: SSID :: sinal :: segura
+  NETWORKS=$(nmcli --fields SSID,SECURITY,SIGNAL device wifi list | awk 'NR>1 { if ($1 != "--") print $1 " :: " $2 " :: " $3 }' | sort -t "::" -k3 -nr)
+
+  # Se nenhuma rede for encontrada
+  if [[ -z "$NETWORKS" ]]; then
+    notify-send "Wi-Fi" "Nenhuma rede encontrada."
+    exit 1
+  fi
+
+  # Abre menu Rofi
+  SELECTED=$(echo "$NETWORKS" | cut -d"::" -f1 | uniq | rofi -dmenu -theme "$ROFI_THEME" -p "Selecionar Wi-Fi:")
+
+  # Se nada for selecionado, sai
+  [[ -z "$SELECTED" ]] && exit
+
+  # Verifica se é rede conhecida
+  if nmcli connection show | grep -q "$SELECTED"; then
+    nmcli connection up "$SELECTED" && notify-send "Wi-Fi" "Conectado a $SELECTED"
+  else
+    # Solicita senha via Rofi
+    PASS=$(rofi -dmenu -theme "$ROFI_THEME" -password -p "Senha de $SELECTED:")
+    [[ -z "$PASS" ]] && exit
+
+    nmcli device wifi connect "$SELECTED" password "$PASS" && notify-send "Wi-Fi" "Conectado a $SELECTED"
+  fi
+
+  exit
+fi
+
+# Exibe status atual
+if [ -n "$SSID" ]; then
+  printf " %s\n" "$SSID"
+  printf " %s\n" "$SSID"
+elif [ -n "$WIRED" ]; then
+  printf " Ethernet\n"
+  printf " Ethernet\n"
+else
+  printf " Desconectado\n"
+  printf " Desconectado\n"
+  echo "#FF0000"
+fi

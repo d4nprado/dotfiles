@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Tema do rofi
+ROFI_THEME="$HOME/.config/rofi/cat-theme-menu.rasi"
+
+# Comandos e ícones
+declare -A options=(
+  [" Suspend"]="systemctl suspend"
+  [" Hibernate"]="systemctl hibernate"
+  [" Lock"]="$HOME/.config/i3/scripts/blur-lock"
+  [" Logout"]="i3-msg exit"
+  [" Reboot"]="systemctl reboot"
+  [" Shutdown"]="systemctl poweroff"
+  [" Cancel"]=""
+)
+
+# Monta o menu com as opções ordenadas
+menu=$(for key in "  Suspend" " Hibernate" " Lock" " Logout" " Reboot" " Shutdown" " Cancel"; do echo "$key"; done | rofi -dmenu -theme "$ROFI_THEME" -p "Power Menu:")
+
+# Executa a opção selecionada
+[[ -n "$menu" && -n "${options[$menu]}" ]] && ${options[$menu]}
+

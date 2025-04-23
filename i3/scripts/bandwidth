@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+# Ícones
+ICON_DOWN=""  # ou ↓
+ICON_UP=""    # ou ↑
+
+iface="${BLOCK_INSTANCE:-$(ip route | awk '/^default via/ {print $5; exit}')}"
+interval=1
+unit="MB"
+
+if [ -z "$iface" ]; then
+  echo "No iface"
+  echo "No iface"
+  exit 0
+fi
+
+read rx1 tx1 < <(awk -v iface="$iface" '$0 ~ iface {print $2, $10}' /proc/net/dev)
+sleep $interval
+read rx2 tx2 < <(awk -v iface="$iface" '$0 ~ iface {print $2, $10}' /proc/net/dev)
+
+drx=$((rx2 - rx1))
+dtx=$((tx2 - tx1))
+
+case "$unit" in
+  KB) div=1024 ;;
+  MB) div=$((1024 * 1024)) ;;
+  *) div=1 ;;
+esac
+
+rx=$(awk "BEGIN {printf \"%.1f\", $drx/$div/$interval}")
+tx=$(awk "BEGIN {printf \"%.1f\", $dtx/$div/$interval}")
+
+# Mostra MB/s só no final
+echo "$ICON_DOWN $rx $ICON_UP $tx $unit/s"
+echo "$ICON_DOWN $rx $ICON_UP $tx $unit/s"

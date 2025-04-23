@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+export LANG="en_US.UTF-8"
+
+SSID=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2)
+WIRED=$(nmcli -t -f DEVICE,TYPE,STATE device | grep '^.*:ethernet:conectado\|connected$' | cut -d: -f1)
+
+if [ "$BLOCK_BUTTON" = "1" ]; then
+    ~/.config/i3/scripts/net-popup.sh &
+    exit
+fi
+
+if [ -n "$SSID" ]; then
+    printf "\uf1eb %s\n" "$SSID"
+    printf "\uf1eb %s\n" "$SSID"
+elif [ -n "$WIRED" ]; then
+    printf "\uf0e8 Ethernet\n"
+    printf "\uf0e8 Ethernet\n"
+else
+    printf "\ueabd Desconectado\n"
+    printf "\ueabd Desconectado\n"
+    echo "#FF0000"
+fi

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Captura o perfil atual
+current=$(powerprofilesctl get)
+
+# Mapeia para ícone
+case "$current" in
+  performance)
+    echo ""
+    ;;
+  balanced)
+    echo ""
+    ;;
+  power-saver)
+    echo ""
+    ;;
+  *)
+    echo ""
+    ;;
+esac

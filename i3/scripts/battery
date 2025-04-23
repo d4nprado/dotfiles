@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# Verifica se há bateria
+if ! acpi -b | grep -q .; then
+    exit 0
+fi
+
+# Coleta status da bateria
+status=$(acpi -b)
+percentage=$(echo "$status" | grep -oP '\d+%' | head -1 | tr -d '%')
+state=$(echo "$status" | awk '{print $3}' | tr -d ',')
+
+# Ícones
+ICON_BATTERY=""
+ICON_CHARGING=""
+ICON_FULL=""
+
+# Cor por nível de bateria
+if (( percentage < 10 )); then
+    color="#FF0000"
+    exit_code=33
+elif (( percentage < 20 )); then
+    color="#FF6600"
+elif (( percentage < 30 )); then
+    color="#FF9900"
+else
+    color="#FFFFFF"
+fi
+
+# Ícone baseado no status
+case "$state" in
+    Charging)
+        icon=$ICON_CHARGING
+        ;;
+    Full)
+        icon=$ICON_FULL
+        ;;
+    Discharging)
+        icon=$ICON_BATTERY
+        ;;
+    *)
+        icon="?"
+        ;;
+esac
+
+# Saída formatada
+echo -e "<span color='$color'>$icon $percentage%</span>"
+echo -e "<span color='$color'>$icon $percentage%</span>"
+
+exit ${exit_code:-0}

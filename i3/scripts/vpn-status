@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# Ícone e cor
+ICON="󰅛"  # outros como 󰲊 󰅛 
+COLOR="#89b4fa"
+
+# Detecta VPN ativa
+VPN_NAME=$(nmcli con show --active | grep vpn | awk '{print $1}' | head -n1)
+VPN_IFACE=$(ip a | grep -Eo 'tun[0-9]+|vpn[0-9]+' | head -n1)
+
+if [[ -n "$VPN_IFACE" ]]; then
+  VPN_IP=$(ip -f inet addr show "$VPN_IFACE" | grep -Po 'inet \K[\d.]+')
+  if [[ -n "$VPN_IP" ]]; then
+    echo "<span color='${COLOR}'>${ICON} ${VPN_IP}</span>"
+    echo "<span color='${COLOR}'>${ICON} ${VPN_IP}</span>"
+    exit 0
+  fi
+fi
+
+# Se não tiver VPN, não exibe nada
+exit 0

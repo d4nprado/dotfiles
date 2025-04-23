@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+caps=$(xset q | grep "Caps Lock:" | awk '{print $4}')
+num=$(xset q | grep "Num Lock:" | awk '{print $8}')
+
+out=""
+[ "$caps" = "on" ] && out+="[A]"
+[ "$num" = "on" ] && out+="[N]"
+
+echo "$out"
+

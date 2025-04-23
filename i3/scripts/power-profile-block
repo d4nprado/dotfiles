@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# Script de bloco para i3blocks: exibe ícone do perfil atual
+# e abre menu ao clicar
+
+ROFI_THEME="$HOME/.config/rofi/cat-theme-menu.rasi"
+
+# Perfis com ícones
+declare -A profiles=(
+  ["performance"]=""
+  ["balanced"]=""
+  ["power-saver"]=""
+)
+
+# Clique com botão esquerdo → abre menu
+if [[ "$BLOCK_BUTTON" == "1" ]]; then
+  declare -A menu_map=(
+    [" Performance"]="performance"
+    [" Balanced"]="balanced"
+    [" Power Saver"]="power-saver"
+    [" Cancel"]=""
+  )
+
+  ordered_keys=(
+    " Performance"
+    " Balanced"
+    " Power Saver"
+    " Cancel"
+  )
+
+  selected=$(printf "%s\n" "${ordered_keys[@]}" | rofi -dmenu -theme "$ROFI_THEME" -p "Power Profile:")
+
+  [[ -n "$selected" && -n "${menu_map[$selected]}" ]] && powerprofilesctl set "${menu_map[$selected]}"
+fi
+
+# Mostra o ícone do perfil atual
+current=$(powerprofilesctl get)
+echo "${profiles[$current]}"
+
