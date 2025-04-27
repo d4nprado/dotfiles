@@ -48,7 +48,7 @@ set $mod Mod4
 
 # default i3 tiling mode:
 workspace_layout default
-new_window pixel 0
+new_window pixel 2
 gaps inner 6
 gaps outer 3
 
@@ -100,7 +100,7 @@ bindsym $mod+r mode "resize"
 ######################################
 
 # start a terminal
-bindsym $mod+Return exec xfce4-terminal
+bindsym $mod+Return exec wezterm
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -142,6 +142,9 @@ bindsym $mod+e layout toggle split
 for_window [class="pavucontrol" instance="pavucontrol"] floating enable
 for_window [class="Yad" instance="yad"] floating enable
 
+bindsym XF86MonBrightnessUp exec brightnessctl set 10%-
+bindsym XF86MonBrightnessDown exec brightnessctl set +10%
+
 # Windows
 client.focused           $lavender $base $text  $rosewater $lavender
 client.focused_inactive  $overlay0 $base $text  $rosewater $overlay0
@@ -173,7 +176,6 @@ bar {
 # Rofi config
 bindsym mod1+F2 exec "rofi -show run -config ~/.config/rofi/rofidmenu.rasi"
 bindsym mod1+Tab exec "rofi -show window -config ~/.config/rofi/rofidmenu.rasi"
-bindsym mod1+l exec ~/.config/rofi/scripts/search.sh
 
 # Music control
 bindsym mod1+Down exec playerctl play-pause
@@ -181,7 +183,17 @@ bindsym mod1+Left exec playerctl previous
 bindsym mod1+Right exec playerctl next
 bindsym mod1+Up exec playerctl stop
 
+bindsym Print exec flameshot full -c
+bindsym Shift+Print exec flameshot gui
+
 # autostart applications/services on login: #
 #get auth work with polkit-gnome
-exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 exec --no-startup-id dex --autostart --environment i3
+
+exec_always --no-startup-id nitrogen --restore
+exec --no-startup-id xsettingsd
+exec --no-startup-id xsetroot -cursor_name left_ptr
+
+# Ativar toque para clique no touchpad
+exec --no-startup-id xinput set-prop "SYNA7DB5:00 06CB:CD41 Touchpad" "libinput Tapping Enabled" 1

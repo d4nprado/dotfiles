@@ -62,7 +62,7 @@ echo
 progress_echo "📂 Instalando utilitários do sistema"
 sudo pacman -S --needed --noconfirm \
   gufw xfce4-terminal git wget curl which \
-  nemo loupe fzf ranger \
+  nemo loupe fzf ranger brightnessctl flameshot \
   xdg-user-dirs-gtk xdg-utils \
   adwaita-icon-theme papirus-icon-theme \
   ttf-roboto ttf-opensans ttf-dejavu \
@@ -77,7 +77,7 @@ echo
 progress_echo "🧱 Instalando i3WM e componentes"
 sudo pacman -S --needed --noconfirm \
   i3-wm i3blocks i3lock lightdm lightdm-gtk-greeter \
-  xorg-xset sysstat lm_sensors \
+  xorg-xset sysstat lm_sensors xsettingsd \
   networkmanager-openvpn nm-connection-editor \
   pavucontrol alsa-utils pamixer playerctl \
   power-profiles-daemon xfce4-power-manager acpi \

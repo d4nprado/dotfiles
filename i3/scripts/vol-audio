@@ -1,40 +1,30 @@
 #!/usr/bin/env bash
 
-# Volume de saída para i3blocks
-# Scroll ↑↓ para aumentar/diminuir
-# Clique direito para mutar/demutar
-
-STEP="5%"
-
-# Detecta PulseAudio/PipeWire
-MIXER="default"
-if command -v pulseaudio >/dev/null 2>&1 && pulseaudio --check ; then
-    if amixer -D pulse info >/dev/null 2>&1 ; then
-        MIXER="pulse"
-    fi
-fi
-
-SCONTROL="${BLOCK_INSTANCE:-Master}"
+STEP=0.05  # 5% de volume
 
 get_volume() {
-    output=$(amixer -D "$MIXER" get "$SCONTROL")
-    volume=$(echo "$output" | grep -oP '\[\d+%\]' | head -1 | tr -d '[]')
-    mute=$(echo "$output" | grep -oP '\[(on|off)\]' | head -1 | tr -d '[]')
+    output=$(wpctl get-volume @DEFAULT_AUDIO_SINK@)
+    vol=$(echo "$output" | awk '{print $2}')
+    muted=$(echo "$output" | grep MUTED)
 
-    if [[ "$mute" = "off" ]]; then
+    if [[ -n "$muted" ]]; then
         echo "MUTE"
         echo "MUTE"
         echo "#FF0000"
     else
-        echo "$volume"
-        echo "$volume"
+        percent=$(awk "BEGIN {printf \"%.0f\", $vol * 100}")
+        if (( percent > 100 )); then
+            percent=100
+        fi
+        echo "${percent}%"
+        echo "${percent}%"
     fi
 }
 
 case "$BLOCK_BUTTON" in
-    3) amixer -q -D "$MIXER" sset "$SCONTROL" toggle ;;              # botão direito: mute
-    4) amixer -q -D "$MIXER" sset "$SCONTROL" ${STEP}+ unmute ;;    # scroll up
-    5) amixer -q -D "$MIXER" sset "$SCONTROL" ${STEP}- unmute ;;    # scroll down
+    3) wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle ;;  # botão direito: mute
+    4) wpctl set-volume @DEFAULT_AUDIO_SINK@ $STEP+ ;; # scroll up
+    5) wpctl set-volume @DEFAULT_AUDIO_SINK@ $STEP- ;; # scroll down
 esac
 
 get_volume

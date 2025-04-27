@@ -1,37 +1,30 @@
 #!/usr/bin/env bash
 
-MIXER="default"
-STEP="5%"
-
-# Detecta PulseAudio
-if command -v pulseaudio >/dev/null 2>&1 && pulseaudio --check ; then
-    if amixer -D pulse info >/dev/null 2>&1 ; then
-        MIXER="pulse"
-    fi
-fi
-
-SCONTROL="${BLOCK_INSTANCE:-Capture}"
+STEP=0.05
 
 get_volume() {
-    output=$(amixer -D "$MIXER" get "$SCONTROL" Capture)
+    output=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@)
+    vol=$(echo "$output" | awk '{print $2}')
+    muted=$(echo "$output" | grep MUTED)
 
-    volume=$(echo "$output" | grep -oP '\[\d+%\]' | head -1 | tr -d '[]')
-    mute=$(echo "$output" | grep -oP '\[(on|off)\]' | tail -1 | tr -d '[]')
-
-    if [ "$mute" = "off" ]; then
+    if [[ -n "$muted" ]]; then
         echo "MUTE"
         echo "MUTE"
         echo "#FF0000"
     else
-        echo "$volume"
-        echo "$volume"
+        percent=$(awk "BEGIN {printf \"%.0f\", $vol * 100}")
+        if (( percent > 100 )); then
+            percent=100
+        fi
+        echo "${percent}%"
+        echo "${percent}%"
     fi
 }
 
 case "$BLOCK_BUTTON" in
-    3) amixer -q -D "$MIXER" sset "$SCONTROL" toggle ;;
-    4) amixer -q -D "$MIXER" sset "$SCONTROL" ${STEP}+ unmute ;;
-    5) amixer -q -D "$MIXER" sset "$SCONTROL" ${STEP}- unmute ;;
+    3) wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle ;;
+    4) wpctl set-volume @DEFAULT_AUDIO_SOURCE@ $STEP+ ;;
+    5) wpctl set-volume @DEFAULT_AUDIO_SOURCE@ $STEP- ;;
 esac
 
 get_volume
