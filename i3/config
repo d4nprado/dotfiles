@@ -197,3 +197,4 @@ exec --no-startup-id xsetroot -cursor_name left_ptr
 
 # Ativar toque para clique no touchpad
 exec --no-startup-id xinput set-prop "SYNA7DB5:00 06CB:CD41 Touchpad" "libinput Tapping Enabled" 1
+exec --no-startup-id wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1
