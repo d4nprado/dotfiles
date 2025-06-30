@@ -63,7 +63,7 @@ progress_echo "📂 Instalando utilitários do sistema"
 sudo pacman -S --needed --noconfirm \
   gufw xfce4-terminal git wget curl which \
   nemo loupe fzf ranger brightnessctl flameshot \
-  xdg-user-dirs-gtk xdg-utils \
+  xdg-user-dirs-gtk xdg-utils brightnessctl \
   adwaita-icon-theme papirus-icon-theme \
   ttf-roboto ttf-opensans ttf-dejavu \
   ttf-jetbrains-mono-nerd ttf-nerd-fonts-symbols
