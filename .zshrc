@@ -20,12 +20,9 @@ alias edit-zsh="nano ~/.zshrc"
 
 alias cat="bat --theme=Dracula "
 alias ls="exa --group-directories-first --color=always --icons=always"
-alias code="codium"
+alias code="zeditor"
 
 export PATH="$HOME/.asdf/shims:$PATH"
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - zsh)"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
