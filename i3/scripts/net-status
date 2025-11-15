@@ -1,22 +1,109 @@
 #!/usr/bin/env bash
-export LANG="en_US.UTF-8"
 
+# Tema do Rofi
+ROFI_THEME="$HOME/.config/rofi/cat-theme-menu.rasi"
+
+# Ícones
+ICON_WIFI=""
+ICON_ETHERNET=""
+ICON_DISCONNECTED=""
+ICON_WIFI_ON="󰤨"
+ICON_WIFI_OFF="❌"
+
+# Interface Wi-Fi
+WIFI_IFACE=$(nmcli device | grep wifi | awk '{print $1}' | head -n1)
+ETHERNET_CONNECTED=$(nmcli device status | grep ethernet | grep connected)
+
+# Estado do Wi-Fi (enabled/disabled)
+WIFI_STATE=$(nmcli radio wifi)
+
+# SSID conectado
 SSID=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2)
-WIRED=$(nmcli -t -f DEVICE,TYPE,STATE device | grep '^.*:ethernet:conectado\|connected$' | cut -d: -f1)
 
-if [ "$BLOCK_BUTTON" = "1" ]; then
-    ~/.config/i3/scripts/net-popup.sh &
-    exit
-fi
+# Nome do sinal para i3blocks
+SIGNAL_NUMBER=1
 
-if [ -n "$SSID" ]; then
-    printf "\uf1eb %s\n" "$SSID"
-    printf "\uf1eb %s\n" "$SSID"
-elif [ -n "$WIRED" ]; then
-    printf "\uf0e8 Ethernet\n"
-    printf "\uf0e8 Ethernet\n"
-else
-    printf "\ueabd Desconectado\n"
-    printf "\ueabd Desconectado\n"
+# ---------------------------------
+# Função: mostrar o status na barra
+# ---------------------------------
+show_status() {
+  if [[ -n "$SSID" ]]; then
+    printf "$ICON_WIFI %s\n" "$SSID"
+    printf "$ICON_WIFI %s\n" "$SSID"
+  elif [[ -n "$ETHERNET_CONNECTED" ]]; then
+    printf "$ICON_ETHERNET Ethernet\n"
+    printf "$ICON_ETHERNET Ethernet\n"
+  else
+    printf "$ICON_DISCONNECTED Desconectado\n"
+    printf "$ICON_DISCONNECTED Desconectado\n"
     echo "#FF0000"
+  fi
+}
+
+# ---------------------------------
+# Clique no bloco
+# ---------------------------------
+if [[ "$BLOCK_BUTTON" == "1" ]]; then
+
+  OPTIONS=()
+
+  if [[ "$WIFI_STATE" == "disabled" ]]; then
+    OPTIONS+=("$ICON_WIFI_OFF Wi-Fi: Desligado")
+  else
+    OPTIONS+=("$ICON_WIFI_ON Wi-Fi: Ligado")
+
+    # Lista de redes Wi-Fi com segurança e força de sinal
+    NETWORKS=$(nmcli --terse --fields SSID,SECURITY,SIGNAL device wifi list | sort -u)
+    while IFS=: read -r ssid security signal; do
+      [[ -z "$ssid" ]] && continue
+      lock="🌎"
+      [[ "$security" != "--" ]] && lock="🔑"
+      OPTIONS+=("${signal}% - $ssid")
+    done <<< "$NETWORKS"
+
+  fi
+
+  SELECTED=$(printf "%s\n" "${OPTIONS[@]}" | rofi -dmenu -theme "$ROFI_THEME" -p "Rede Wi-Fi:")
+
+  # Limpa o texto para pegar só o SSID real
+  CLEAN_SELECTED=$(echo "$SELECTED" | sed -E 's/^[^ ]+ [^ ]+ //')
+
+  # Ações de acordo com o que selecionou
+  if [[ "$SELECTED" == *"Wi-Fi: Desligado"* ]]; then
+    nmcli radio wifi on
+    notify-send "Wi-Fi" "Wi-Fi ligado!"
+    sleep 1
+    pkill -RTMIN+$SIGNAL_NUMBER i3blocks
+    exit 0
+  elif [[ "$SELECTED" == *"Wi-Fi: Ligado"* ]]; then
+    nmcli radio wifi off
+    notify-send "Wi-Fi" "Wi-Fi desligado!"
+    sleep 1
+    pkill -RTMIN+$SIGNAL_NUMBER i3blocks
+    exit 0
+  elif [[ -n "$CLEAN_SELECTED" ]]; then
+    if nmcli -t -f NAME connection show | grep -Fxq "$CLEAN_SELECTED"; then
+      # Existe perfil salvo para exatamente essa rede → conecta direto
+      if nmcli connection up "$CLEAN_SELECTED"; then
+        notify-send "Wi-Fi" "Conectado a $CLEAN_SELECTED"
+      else
+        # Se falhar conexão → pede senha
+        nmcli connection delete id "$CLEAN_SELECTED" 2>/dev/null
+        PASS=$(rofi -dmenu -theme "$ROFI_THEME" -password -p "Senha para $CLEAN_SELECTED:")
+        [[ -z "$PASS" ]] && exit
+        nmcli device wifi connect "$CLEAN_SELECTED" password "$PASS" && notify-send "Wi-Fi" "Conectado a $CLEAN_SELECTED"
+      fi
+    else
+      # Não existe perfil salvo → pede senha
+      PASS=$(rofi -dmenu -theme "$ROFI_THEME" -password -p "Senha para $CLEAN_SELECTED:")
+      [[ -z "$PASS" ]] && exit
+      nmcli device wifi connect "$CLEAN_SELECTED" password "$PASS" && notify-send "Wi-Fi" "Conectado a $CLEAN_SELECTED"
+    fi
+    sleep 1
+    pkill -RTMIN+$SIGNAL_NUMBER i3blocks
+    exit 0
+  fi
 fi
+
+# Se não clicar, só exibe
+show_status

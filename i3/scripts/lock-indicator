@@ -8,4 +8,3 @@ out=""
 [ "$num" = "on" ] && out+="[N]"
 
 echo "$out"
-

@@ -36,4 +36,3 @@ fi
 # Mostra o ícone do perfil atual
 current=$(powerprofilesctl get)
 echo "${profiles[$current]}"
-
