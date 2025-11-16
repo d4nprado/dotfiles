@@ -1,0 +1,48 @@
+// Zed settings
+//
+{
+  "icon_theme": "Material Icon Theme",
+  "ui_font_size": 14,
+  "buffer_font_size": 14,
+  "terminal": {
+    "font_size": 14,
+    "font_family": "JetBrainsMonoNL Nerd Font Mono",
+    "cursor_shape": "block"
+  },
+  "theme": {
+    "mode": "dark",
+    "light": "Catppuccin Latte (Blur)",
+    "dark": "Catppuccin Mocha Blur"
+  },
+  "base_keymap": "VSCode",
+  "project_panel": {
+    "auto_fold_dirs": false
+  },
+  "git": {
+    "inline_blame": {
+      "enabled": false
+    }
+  },
+  "show_completions_on_input": false,
+  "show_completion_documentation": true,
+  "show_edit_predictions": false,
+  "languages": {
+    "Python": {
+      "language_servers": ["pyright", "ruff"],
+      "format_on_save": "on",
+      "formatter": [
+        {
+          "code_actions": {
+            "source.organizeImports.ruff": true,
+            "source.fixAll.ruff": true
+          }
+        },
+        {
+          "language_server": {
+            "name": "ruff"
+          }
+        }
+      ]
+    }
+  }
+}
